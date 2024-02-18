@@ -300,4 +300,4 @@ err_code_t nrf24l01_clear_rx_dr(nrf24l01_handle_t handle);
 }
 #endif
 
-#endif /* __ENCODER_H__ */
+#endif /* __NRF24L01_H__ */
