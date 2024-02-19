@@ -29,8 +29,8 @@ extern "C" {
 
 #include "err_code.h"
 
-typedef err_code_t (*nrf24l01_func_spi_send)(uint8_t *buf_send, uint16_t len, uint32_t timeout_ms);
-typedef err_code_t (*nrf24l01_func_spi_recv)(uint8_t *buf_recv, uint16_t len, uint32_t timeout_ms);
+typedef err_code_t (*nrf24l01_func_spi_send)(uint8_t *buf_send, uint16_t len);
+typedef err_code_t (*nrf24l01_func_spi_recv)(uint8_t *buf_recv, uint16_t len);
 typedef err_code_t (*nrf24l01_func_set_cs)(uint8_t level);
 typedef err_code_t (*nrf24l01_func_set_ce)(uint8_t level);
 

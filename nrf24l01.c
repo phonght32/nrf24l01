@@ -46,8 +46,6 @@
 #define NRF24L01P_REG_DYNPD             0x1C
 #define NRF24L01P_REG_FEATURE           0x1D
 
-#define SPI_ACTION_TIMEOUT 				1000
-
 #define NRF24L01_CS_ACTIVE 				0
 #define NRF24L01_CS_UNACTIVE 			1
 
@@ -74,8 +72,8 @@ static uint8_t nrf24l01_read_register(nrf24l01_handle_t handle, uint8_t reg)
 	uint8_t read_val;
 
 	handle->set_cs(NRF24L01_CS_ACTIVE);
-	handle->spi_send(&command, 1, SPI_ACTION_TIMEOUT);
-	handle->spi_recv(&read_val, 1, SPI_ACTION_TIMEOUT);
+	handle->spi_send(&command, 1);
+	handle->spi_recv(&read_val, 1);
 	handle->set_cs(NRF24L01_CS_UNACTIVE);
 
 	return read_val;
@@ -87,8 +85,8 @@ static err_code_t nrf24l01_write_register(nrf24l01_handle_t handle, uint8_t reg,
 	uint8_t write_val = value;
 
 	handle->set_cs(NRF24L01_CS_ACTIVE);
-	handle->spi_send(&command, 1, SPI_ACTION_TIMEOUT);
-	handle->spi_send(&write_val, 1, SPI_ACTION_TIMEOUT);
+	handle->spi_send(&command, 1);
+	handle->spi_send(&write_val, 1);
 	handle->set_cs(NRF24L01_CS_UNACTIVE);
 
 	return ERR_CODE_SUCCESS;
@@ -99,8 +97,8 @@ static err_code_t nrf24l01_read_rx_fifo(nrf24l01_handle_t handle, uint8_t* rx_pa
 	uint8_t command = NRF24L01P_CMD_R_RX_PAYLOAD;
 
 	handle->set_cs(NRF24L01_CS_ACTIVE);
-	handle->spi_send(&command, 1, SPI_ACTION_TIMEOUT);
-	handle->spi_recv(rx_payload, handle->payload_len, SPI_ACTION_TIMEOUT);
+	handle->spi_send(&command, 1);
+	handle->spi_recv(rx_payload, handle->payload_len);
 	handle->set_cs(NRF24L01_CS_UNACTIVE);
 
 	return ERR_CODE_SUCCESS;
@@ -111,8 +109,8 @@ static err_code_t nrf24l01_write_tx_fifo(nrf24l01_handle_t handle, uint8_t* tx_p
 	uint8_t command = NRF24L01P_CMD_W_TX_PAYLOAD;
 
 	handle->set_cs(NRF24L01_CS_ACTIVE);
-	handle->spi_send(&command, 1, SPI_ACTION_TIMEOUT);
-	handle->spi_send(tx_payload, handle->payload_len, SPI_ACTION_TIMEOUT);
+	handle->spi_send(&command, 1);
+	handle->spi_send(tx_payload, handle->payload_len);
 	handle->set_cs(NRF24L01_CS_UNACTIVE);
 
 	return ERR_CODE_SUCCESS;
@@ -390,7 +388,7 @@ err_code_t nrf24l01_flush_rx_fifo(nrf24l01_handle_t handle)
 	uint8_t command = NRF24L01P_CMD_FLUSH_RX;
 
 	handle->set_cs(NRF24L01_CS_ACTIVE);
-	handle->spi_send(&command, 1, SPI_ACTION_TIMEOUT);
+	handle->spi_send(&command, 1);
 	handle->set_cs(NRF24L01_CS_UNACTIVE);
 
 	return ERR_CODE_SUCCESS;
@@ -407,7 +405,7 @@ err_code_t nrf24l01_flush_tx_fifo(nrf24l01_handle_t handle)
 	uint8_t command = NRF24L01P_CMD_FLUSH_TX;
 
 	handle->set_cs(NRF24L01_CS_ACTIVE);
-	handle->spi_send(&command, 1, SPI_ACTION_TIMEOUT);
+	handle->spi_send(&command, 1);
 	handle->set_cs(NRF24L01_CS_UNACTIVE);
 
 	return ERR_CODE_SUCCESS;
@@ -454,7 +452,7 @@ err_code_t nrf24l01_get_status(nrf24l01_handle_t handle, uint8_t *status)
 	}
 
 	handle->set_cs(NRF24L01_CS_ACTIVE);
-	handle->spi_recv(status, 1, SPI_ACTION_TIMEOUT);
+	handle->spi_recv(status, 1);
 	handle->set_cs(NRF24L01_CS_UNACTIVE);
 
 	return ERR_CODE_SUCCESS;
