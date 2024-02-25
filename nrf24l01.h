@@ -31,8 +31,8 @@ extern "C" {
 
 typedef err_code_t (*nrf24l01_func_spi_send)(uint8_t *buf_send, uint16_t len);
 typedef err_code_t (*nrf24l01_func_spi_recv)(uint8_t *buf_recv, uint16_t len);
-typedef err_code_t (*nrf24l01_func_set_cs)(uint8_t level);
-typedef err_code_t (*nrf24l01_func_set_ce)(uint8_t level);
+typedef err_code_t (*nrf24l01_func_set_gpio)(uint8_t level);
+typedef err_code_t (*nrf24l01_func_set_gpio)(uint8_t level);
 
 /**
  * @brief   NRF24L01 handle structure.
@@ -81,8 +81,8 @@ typedef struct {
 	nrf24l01_mode_t 			mode;			/*!< Mode operation */
 	nrf24l01_func_spi_send 		spi_send;		/*!< Function SPI send */
 	nrf24l01_func_spi_recv 		spi_recv;		/*!< Function SPI receive */
-	nrf24l01_func_set_cs 		set_cs;			/*!< Function set chip select pin */
-	nrf24l01_func_set_ce 		set_ce;			/*!< Function set chip enable pin */
+	nrf24l01_func_set_gpio 		set_cs;			/*!< Function set chip select pin */
+	nrf24l01_func_set_gpio 		set_ce;			/*!< Function set chip enable pin */
 } nrf24l01_cfg_t;
 
 /*

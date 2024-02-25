@@ -62,8 +62,8 @@ typedef struct nrf24l01 {
 	nrf24l01_mode_t 			mode;			/*!< Mode operation */
 	nrf24l01_func_spi_send 		spi_send;		/*!< Function SPI send */
 	nrf24l01_func_spi_recv 		spi_recv;		/*!< Function SPI receive */
-	nrf24l01_func_set_cs 		set_cs;			/*!< Function set chip select pin */
-	nrf24l01_func_set_ce 		set_ce;			/*!< Function set chip enable pin */
+	nrf24l01_func_set_gpio 		set_cs;			/*!< Function set chip select pin */
+	nrf24l01_func_set_gpio 		set_ce;			/*!< Function set chip enable pin */
 } nrf24l01_t;
 
 static uint8_t nrf24l01_read_register(nrf24l01_handle_t handle, uint8_t reg)
