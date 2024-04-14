@@ -32,7 +32,8 @@ extern "C" {
 typedef err_code_t (*nrf24l01_func_spi_send)(uint8_t *buf_send, uint16_t len);
 typedef err_code_t (*nrf24l01_func_spi_recv)(uint8_t *buf_recv, uint16_t len);
 typedef err_code_t (*nrf24l01_func_set_gpio)(uint8_t level);
-typedef err_code_t (*nrf24l01_func_set_gpio)(uint8_t level);
+typedef err_code_t (*nrf24l01_func_get_gpio)(uint8_t *level);
+typedef void (*nrf24l01_func_delay)(uint8_t time_ms);
 
 /**
  * @brief   NRF24L01 handle structure.
@@ -83,6 +84,8 @@ typedef struct {
 	nrf24l01_func_spi_recv 		spi_recv;		/*!< Function SPI receive */
 	nrf24l01_func_set_gpio 		set_cs;			/*!< Function set chip select pin */
 	nrf24l01_func_set_gpio 		set_ce;			/*!< Function set chip enable pin */
+	nrf24l01_func_get_gpio 		get_irq;		/*!< Function get irq pin */
+	nrf24l01_func_delay			delay; 			/*!< Function delay */
 } nrf24l01_cfg_t;
 
 /*
@@ -122,19 +125,8 @@ err_code_t nrf24l01_set_config(nrf24l01_handle_t handle, nrf24l01_cfg_t config);
 err_code_t nrf24l01_config(nrf24l01_handle_t handle);
 
 /*
- * @brief   Get received data into buffer.
- *
- * @param 	handle Handle structure.
- * @param 	rx_payload Received buffer.
- *
- * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
- */
-err_code_t nrf24l01_receive(nrf24l01_handle_t handle, uint8_t* rx_payload);
-
-/*
- * @brief   Put transfered data into buffer.
+ * @brief   Transmit data. After that, monitor IRQ pin is necessary to call
+ * 			"nrf24l01_clear_transmit_irq_flags" which clear transmitted interrupt flags.
  *
  * @param 	handle Handle structure.
  * @param 	tx_payload Transmit buffer.
@@ -146,11 +138,59 @@ err_code_t nrf24l01_receive(nrf24l01_handle_t handle, uint8_t* rx_payload);
 err_code_t nrf24l01_transmit(nrf24l01_handle_t handle, uint8_t* tx_payload);
 
 /*
- * @brief   Transmit callback function.
+ * @brief   Transmit data and polling until IRQ is triggered or timeout. Function
+ * 			"nrf24l01_clear_transmit_irq_flags" is called automatically to clear
+ * 			transmitted interrupt flags if transmit success.
  *
- * @note 	This function should be called when transmit completely. If furthe
- * 			activities need to be performed, please replace this function by
- * 			custom IRQ fuction.
+ * @note 	Functions "get_irq" and "delay" need to be assigned.
+ *
+ * @param 	handle Handle structure.
+ * @param 	tx_payload Transmit buffer.
+ * @param 	timeout_ms Timeout in ms.
+ *
+ * @return
+ *      - ERR_CODE_SUCCESS: Success.
+ *      - Others:           Fail.
+ */
+err_code_t nrf24l01_transmit_polling(nrf24l01_handle_t handle, uint8_t* tx_payload, uint32_t timeout_ms);
+
+/*
+ * @brief   Receive data and call "nrf24l01_clear_receive_irq_flags" automatically
+ * 			to clear received interrupt flags when receive success.
+ * 			Monitor IRQ pin is neccessary to ensure data are received before
+ * 			call this function.
+ *
+ * @param 	handle Handle structure.
+ * @param 	rx_payload Received buffer.
+ *
+ * @return
+ *      - ERR_CODE_SUCCESS: Success.
+ *      - Others:           Fail.
+ */
+err_code_t nrf24l01_receive(nrf24l01_handle_t handle, uint8_t* rx_payload);
+
+/*
+ * @brief   Polling until IRQ pin is triggered or timeout. When data is received,
+ * 			function "nrf24l01_clear_receive_irq_flags" is called automatically to
+ * 			clear received interrupt flags.
+ *
+ * @note    Functions "get_irq" and "delay" need to be assigned.
+ *
+ * @param 	handle Handle structure.
+ * @param 	rx_payload Received buffer.
+ * @param 	timeout_ms Timeout in ms.
+ *
+ * @return
+ *      - ERR_CODE_SUCCESS: Success.
+ *      - Others:           Fail.
+ */
+err_code_t nrf24l01_receive_polling(nrf24l01_handle_t handle, uint8_t* rx_payload, uint32_t timeout_ms);
+
+/*
+ * @brief   Clear transmitted interrupt flags.
+ *
+ * @note 	After data sent by "nrf24l01_transmit", this function should be called
+ * 			when IRQ pin triggered which notify transmit complete.
  *
  * @param 	handle Handle structure.
  *
@@ -158,7 +198,21 @@ err_code_t nrf24l01_transmit(nrf24l01_handle_t handle, uint8_t* tx_payload);
  *      - ERR_CODE_SUCCESS: Success.
  *      - Others:           Fail.
  */
-err_code_t nrf24l01_transmit_irq(nrf24l01_handle_t handle);
+err_code_t nrf24l01_clear_transmit_irq_flags(nrf24l01_handle_t handle);
+
+/*
+ * @brief   Clear received interrupt flags.
+ *
+ * @note 	This function should be called when IRQ pin triggered which notify
+ * 			data ready. Then, "nrf24l01_receive" can be called to read received data.
+ *
+ * @param 	handle Handle structure.
+ *
+ * @return
+ *      - ERR_CODE_SUCCESS: Success.
+ *      - Others:           Fail.
+ */
+err_code_t nrf24l01_clear_receive_irq_flags(nrf24l01_handle_t handle);
 
 /*
  * @brief   Flush receive buffer.

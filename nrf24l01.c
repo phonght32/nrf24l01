@@ -64,6 +64,8 @@ typedef struct nrf24l01 {
 	nrf24l01_func_spi_recv 		spi_recv;		/*!< Function SPI receive */
 	nrf24l01_func_set_gpio 		set_cs;			/*!< Function set chip select pin */
 	nrf24l01_func_set_gpio 		set_ce;			/*!< Function set chip enable pin */
+	nrf24l01_func_get_gpio 		get_irq;		/*!< Function get irq pin */
+	nrf24l01_func_delay			delay; 			/*!< Function delay */
 } nrf24l01_t;
 
 static uint8_t nrf24l01_read_register(nrf24l01_handle_t handle, uint8_t reg)
@@ -248,6 +250,8 @@ err_code_t nrf24l01_set_config(nrf24l01_handle_t handle, nrf24l01_cfg_t config)
 	handle->spi_recv = config.spi_recv;
 	handle->set_cs = config.set_cs;
 	handle->set_ce = config.set_ce;
+	handle->get_irq = config.get_irq;
+	handle->delay = config.delay;
 
 	return ERR_CODE_SUCCESS;
 }
@@ -325,6 +329,57 @@ err_code_t nrf24l01_config(nrf24l01_handle_t handle)
 	return ERR_CODE_SUCCESS;
 }
 
+err_code_t nrf24l01_transmit(nrf24l01_handle_t handle, uint8_t* tx_payload)
+{
+	/* Check if handle structure is NULL */
+	if (handle == NULL)
+	{
+		return ERR_CODE_NULL_PTR;
+	}
+
+	nrf24l01_write_tx_fifo(handle, tx_payload);
+
+	return ERR_CODE_SUCCESS;
+}
+
+err_code_t nrf24l01_transmit_polling(nrf24l01_handle_t handle, uint8_t* tx_payload, uint32_t timeout_ms)
+{
+	/* Check if handle structure is NULL */
+	if (handle == NULL)
+	{
+		return ERR_CODE_NULL_PTR;
+	}
+
+	if ((handle->delay == NULL) || (handle->get_irq == NULL))
+	{
+		return ERR_CODE_FAIL;
+	}
+
+	uint8_t irq_level;
+
+	nrf24l01_write_tx_fifo(handle, tx_payload);
+
+	while (1)
+	{
+		handle->get_irq(&irq_level);
+		if (irq_level)
+		{
+			nrf24l01_clear_transmit_irq_flags(handle);
+
+			return ERR_CODE_SUCCESS;
+		}
+
+		if (--timeout_ms == 0)
+		{
+			return ERR_CODE_FAIL;
+		}
+
+		handle->delay(1);
+	}
+
+	return ERR_CODE_SUCCESS;
+}
+
 err_code_t nrf24l01_receive(nrf24l01_handle_t handle, uint8_t* rx_payload)
 {
 	/* Check if handle structure is NULL */
@@ -339,7 +394,7 @@ err_code_t nrf24l01_receive(nrf24l01_handle_t handle, uint8_t* rx_payload)
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t nrf24l01_transmit(nrf24l01_handle_t handle, uint8_t* tx_payload)
+err_code_t nrf24l01_receive_polling(nrf24l01_handle_t handle, uint8_t* rx_payload, uint32_t timeout_ms)
 {
 	/* Check if handle structure is NULL */
 	if (handle == NULL)
@@ -347,12 +402,36 @@ err_code_t nrf24l01_transmit(nrf24l01_handle_t handle, uint8_t* tx_payload)
 		return ERR_CODE_NULL_PTR;
 	}
 
-	nrf24l01_write_tx_fifo(handle, tx_payload);
+	if ((handle->delay == NULL) || (handle->get_irq == NULL))
+	{
+		return ERR_CODE_FAIL;
+	}
+
+	uint8_t irq_level;
+
+	while (1)
+	{
+		handle->get_irq(&irq_level);
+		if (irq_level)
+		{
+			nrf24l01_read_rx_fifo(handle, rx_payload);
+			nrf24l01_clear_rx_dr(handle);
+
+			return ERR_CODE_SUCCESS;
+		}
+
+		if (--timeout_ms == 0)
+		{
+			return ERR_CODE_FAIL;
+		}
+
+		handle->delay(1);
+	}
 
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t nrf24l01_transmit_irq(nrf24l01_handle_t handle)
+err_code_t nrf24l01_clear_transmit_irq_flags(nrf24l01_handle_t handle)
 {
 	/* Check if handle structure is NULL */
 	if (handle == NULL)
@@ -362,17 +441,28 @@ err_code_t nrf24l01_transmit_irq(nrf24l01_handle_t handle)
 
 	uint8_t tx_ds;
 	nrf24l01_get_status(handle, &tx_ds);
-	tx_ds &= 0x20;
 
-	if (tx_ds)
+	if (tx_ds & 0x20)
 	{
 		nrf24l01_clear_tx_ds(handle);
 	}
-
 	else
 	{
 		nrf24l01_clear_max_rt(handle);
 	}
+
+	return ERR_CODE_SUCCESS;
+}
+
+err_code_t nrf24l01_clear_receive_irq_flags(nrf24l01_handle_t handle)
+{
+	/* Check if handle structure is NULL */
+	if (handle == NULL)
+	{
+		return ERR_CODE_NULL_PTR;
+	}
+
+	nrf24l01_clear_rx_dr(handle);
 
 	return ERR_CODE_SUCCESS;
 }
