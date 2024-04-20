@@ -66,29 +66,29 @@ typedef enum {
  * @brief   Mode.
  */
 typedef enum {
-	NRF24L01_MODE_TRANSMITTER = 0,				/*!< Mode transmitter */
-	NRF24L01_MODE_RECEIVER						/*!< Mode receiver */
-} nrf24l01_mode_t;
+	NRF24L01_TRANSCEIVER_MODE_TX = 0,			/*!< Mode transmitter */
+	NRF24L01_TRANSCEIVER_MODE_RX				/*!< Mode receiver */
+} nrf24l01_transceiver_mode_t;
 
 /**
  * @brief   Configuration structure.
  */
 typedef struct {
-	uint16_t  					channel; 		/*!< Channel */
-	uint8_t 					packet_len;		/*!< Packet length */
-	uint8_t  					crc_len; 		/*!< CRC length */
-	uint8_t  					addr_width; 	/*!< Address width */
-	uint8_t  					retrans_cnt; 	/*!< Re-transmit count */
-	uint8_t  					retrans_delay; 	/*!< Re-transmit delay */
-	nrf24l01_data_rate_t 		data_rate;		/*!< Data rate */
-	nrf24l01_output_pwr_t 		output_pwr;		/*!< Output power */
-	nrf24l01_mode_t 			mode;			/*!< Mode operation */
-	nrf24l01_func_spi_send 		spi_send;		/*!< Function SPI send */
-	nrf24l01_func_spi_recv 		spi_recv;		/*!< Function SPI receive */
-	nrf24l01_func_set_gpio 		set_cs;			/*!< Function set chip select pin */
-	nrf24l01_func_set_gpio 		set_ce;			/*!< Function set chip enable pin */
-	nrf24l01_func_get_gpio 		get_irq;		/*!< Function get irq pin */
-	nrf24l01_func_delay			delay; 			/*!< Function delay */
+	uint16_t  					channel; 			/*!< Channel */
+	uint8_t 					packet_len;			/*!< Packet length */
+	uint8_t  					crc_len; 			/*!< CRC length */
+	uint8_t  					addr_width; 		/*!< Address width */
+	uint8_t  					retrans_cnt; 		/*!< Re-transmit count */
+	uint8_t  					retrans_delay; 		/*!< Re-transmit delay */
+	nrf24l01_data_rate_t 		data_rate;			/*!< Data rate */
+	nrf24l01_output_pwr_t 		output_pwr;			/*!< Output power */
+	nrf24l01_transceiver_mode_t transceiver_mode;	/*!< Mode operation */
+	nrf24l01_func_spi_send 		spi_send;			/*!< Function SPI send */
+	nrf24l01_func_spi_recv 		spi_recv;			/*!< Function SPI receive */
+	nrf24l01_func_set_gpio 		set_cs;				/*!< Function set chip select pin */
+	nrf24l01_func_set_gpio 		set_ce;				/*!< Function set chip enable pin */
+	nrf24l01_func_get_gpio 		get_irq;			/*!< Function get irq pin */
+	nrf24l01_func_delay			delay; 				/*!< Function delay */
 } nrf24l01_cfg_t;
 
 /*

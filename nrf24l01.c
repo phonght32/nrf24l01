@@ -51,21 +51,21 @@
 
 
 typedef struct nrf24l01 {
-	uint16_t  					channel; 		/*!< Channel */
-	uint8_t 					packet_len;		/*!< Packet length */
-	uint8_t  					crc_len; 		/*!< CRC length */
-	uint8_t  					addr_width; 	/*!< Address width */
-	uint8_t  					retrans_cnt; 	/*!< Re-transmit count */
-	uint8_t  					retrans_delay; 	/*!< Re-transmit delay */
-	nrf24l01_data_rate_t 		data_rate;		/*!< Data rate */
-	nrf24l01_output_pwr_t 		output_pwr;		/*!< Output power */
-	nrf24l01_mode_t 			mode;			/*!< Mode operation */
-	nrf24l01_func_spi_send 		spi_send;		/*!< Function SPI send */
-	nrf24l01_func_spi_recv 		spi_recv;		/*!< Function SPI receive */
-	nrf24l01_func_set_gpio 		set_cs;			/*!< Function set chip select pin */
-	nrf24l01_func_set_gpio 		set_ce;			/*!< Function set chip enable pin */
-	nrf24l01_func_get_gpio 		get_irq;		/*!< Function get irq pin */
-	nrf24l01_func_delay			delay; 			/*!< Function delay */
+	uint16_t  					channel; 			/*!< Channel */
+	uint8_t 					packet_len;			/*!< Packet length */
+	uint8_t  					crc_len; 			/*!< CRC length */
+	uint8_t  					addr_width; 		/*!< Address width */
+	uint8_t  					retrans_cnt; 		/*!< Re-transmit count */
+	uint8_t  					retrans_delay; 		/*!< Re-transmit delay */
+	nrf24l01_data_rate_t 		data_rate;			/*!< Data rate */
+	nrf24l01_output_pwr_t 		output_pwr;			/*!< Output power */
+	nrf24l01_transceiver_mode_t transceiver_mode;	/*!< Mode operation */
+	nrf24l01_func_spi_send 		spi_send;			/*!< Function SPI send */
+	nrf24l01_func_spi_recv 		spi_recv;			/*!< Function SPI receive */
+	nrf24l01_func_set_gpio 		set_cs;				/*!< Function set chip select pin */
+	nrf24l01_func_set_gpio 		set_ce;				/*!< Function set chip enable pin */
+	nrf24l01_func_get_gpio 		get_irq;			/*!< Function get irq pin */
+	nrf24l01_func_delay			delay; 				/*!< Function delay */
 } nrf24l01_t;
 
 static uint8_t nrf24l01_read_register(nrf24l01_handle_t handle, uint8_t reg)
@@ -245,7 +245,7 @@ err_code_t nrf24l01_set_config(nrf24l01_handle_t handle, nrf24l01_cfg_t config)
 	handle->retrans_delay = config.retrans_delay;
 	handle->data_rate = config.data_rate;
 	handle->output_pwr = config.output_pwr;
-	handle->mode = config.mode;
+	handle->transceiver_mode = config.transceiver_mode;
 	handle->spi_send = config.spi_send;
 	handle->spi_recv = config.spi_recv;
 	handle->set_cs = config.set_cs;
@@ -292,7 +292,7 @@ err_code_t nrf24l01_config(nrf24l01_handle_t handle)
 	nrf24l01_flush_tx_fifo(handle);
 
 	uint8_t reg_config_data = 0;
-	if (handle->mode == NRF24L01_MODE_TRANSMITTER)
+	if (handle->transceiver_mode == NRF24L01_TRANSCEIVER_MODE_TX)
 	{
 		reg_config_data = nrf24l01_read_register(handle, NRF24L01P_REG_CONFIG);
 		reg_config_data &= 0xFE;
@@ -308,7 +308,7 @@ err_code_t nrf24l01_config(nrf24l01_handle_t handle)
 
 	nrf24l01_power_up(handle);
 
-	if (handle->mode == NRF24L01_MODE_RECEIVER)
+	if (handle->transceiver_mode == NRF24L01_TRANSCEIVER_MODE_RX)
 	{
 		nrf24l01_rx_set_payload_widths(handle, handle->packet_len);
 	}
