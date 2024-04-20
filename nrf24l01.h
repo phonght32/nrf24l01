@@ -75,7 +75,7 @@ typedef enum {
  */
 typedef struct {
 	uint16_t  					channel; 		/*!< Channel */
-	uint8_t 					payload_len;	/*!< Payload length */
+	uint8_t 					packet_len;		/*!< Packet length */
 	uint8_t  					crc_len; 		/*!< CRC length */
 	uint8_t  					addr_width; 	/*!< Address width */
 	uint8_t  					retrans_cnt; 	/*!< Re-transmit count */

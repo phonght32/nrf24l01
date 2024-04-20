@@ -52,7 +52,7 @@
 
 typedef struct nrf24l01 {
 	uint16_t  					channel; 		/*!< Channel */
-	uint8_t 					payload_len;	/*!< Payload length */
+	uint8_t 					packet_len;		/*!< Packet length */
 	uint8_t  					crc_len; 		/*!< CRC length */
 	uint8_t  					addr_width; 	/*!< Address width */
 	uint8_t  					retrans_cnt; 	/*!< Re-transmit count */
@@ -100,7 +100,7 @@ static err_code_t nrf24l01_read_rx_fifo(nrf24l01_handle_t handle, uint8_t* rx_pa
 
 	handle->set_cs(NRF24L01_CS_ACTIVE);
 	handle->spi_send(&command, 1);
-	handle->spi_recv(rx_payload, handle->payload_len);
+	handle->spi_recv(rx_payload, handle->packet_len);
 	handle->set_cs(NRF24L01_CS_UNACTIVE);
 
 	return ERR_CODE_SUCCESS;
@@ -112,7 +112,7 @@ static err_code_t nrf24l01_write_tx_fifo(nrf24l01_handle_t handle, uint8_t* tx_p
 
 	handle->set_cs(NRF24L01_CS_ACTIVE);
 	handle->spi_send(&command, 1);
-	handle->spi_send(tx_payload, handle->payload_len);
+	handle->spi_send(tx_payload, handle->packet_len);
 	handle->set_cs(NRF24L01_CS_UNACTIVE);
 
 	return ERR_CODE_SUCCESS;
@@ -238,7 +238,7 @@ err_code_t nrf24l01_set_config(nrf24l01_handle_t handle, nrf24l01_cfg_t config)
 	}
 
 	handle->channel = config.channel;
-	handle->payload_len = config.payload_len;
+	handle->packet_len = config.packet_len;
 	handle->crc_len = config.crc_len;
 	handle->addr_width = config.addr_width;
 	handle->retrans_cnt = config.retrans_cnt;
@@ -310,7 +310,7 @@ err_code_t nrf24l01_config(nrf24l01_handle_t handle)
 
 	if (handle->mode == NRF24L01_MODE_RECEIVER)
 	{
-		nrf24l01_rx_set_payload_widths(handle, handle->payload_len);
+		nrf24l01_rx_set_payload_widths(handle, handle->packet_len);
 	}
 
 	nrf24l01_set_rf_channel(handle, handle->channel);
