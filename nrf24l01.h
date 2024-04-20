@@ -33,7 +33,7 @@ typedef err_code_t (*nrf24l01_func_spi_send)(uint8_t *buf_send, uint16_t len);
 typedef err_code_t (*nrf24l01_func_spi_recv)(uint8_t *buf_recv, uint16_t len);
 typedef err_code_t (*nrf24l01_func_set_gpio)(uint8_t level);
 typedef err_code_t (*nrf24l01_func_get_gpio)(uint8_t *level);
-typedef void (*nrf24l01_func_delay)(uint8_t time_ms);
+typedef void (*nrf24l01_func_delay)(uint32_t time_ms);
 
 /**
  * @brief   NRF24L01 handle structure.
