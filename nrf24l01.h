@@ -29,6 +29,9 @@ extern "C" {
 
 #include "err_code.h"
 
+#define NRF24L01_IRQ_ACTIVE_LEVEL 		0
+#define NRF24L01_IRQ_UNACTIVE_LEVEL 	1
+
 typedef err_code_t (*nrf24l01_func_spi_send)(uint8_t *buf_send, uint16_t len);
 typedef err_code_t (*nrf24l01_func_spi_recv)(uint8_t *buf_recv, uint16_t len);
 typedef err_code_t (*nrf24l01_func_set_gpio)(uint8_t level);
