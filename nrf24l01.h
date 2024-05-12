@@ -158,8 +158,7 @@ err_code_t nrf24l01_transmit(nrf24l01_handle_t handle, uint8_t* tx_payload);
 err_code_t nrf24l01_transmit_polling(nrf24l01_handle_t handle, uint8_t* tx_payload, uint32_t timeout_ms);
 
 /*
- * @brief   Receive data and call "nrf24l01_clear_receive_irq_flags" automatically
- * 			to clear received interrupt flags when receive success.
+ * @brief   Read data on RX FIFO. If no data is received, all are 0x00.
  * 			Monitor IRQ pin is neccessary to ensure data are received before
  * 			call this function.
  *

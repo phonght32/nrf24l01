@@ -389,7 +389,6 @@ err_code_t nrf24l01_receive(nrf24l01_handle_t handle, uint8_t* rx_payload)
 	}
 
 	nrf24l01_read_rx_fifo(handle, rx_payload);
-	nrf24l01_clear_rx_dr(handle);
 
 	return ERR_CODE_SUCCESS;
 }
