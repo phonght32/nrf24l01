@@ -27,15 +27,22 @@
 extern "C" {
 #endif
 
-#include "err_code.h"
+#include "stdint.h"
 
 #define NRF24L01_IRQ_ACTIVE_LEVEL 		0
 #define NRF24L01_IRQ_UNACTIVE_LEVEL 	1
 
-typedef err_code_t (*nrf24l01_func_spi_send)(uint8_t *buf_send, uint16_t len);
-typedef err_code_t (*nrf24l01_func_spi_recv)(uint8_t *buf_recv, uint16_t len);
-typedef err_code_t (*nrf24l01_func_set_gpio)(uint8_t level);
-typedef err_code_t (*nrf24l01_func_get_gpio)(uint8_t *level);
+typedef enum
+{
+	NRF24L01_STATUS_SUCCESS,
+	NRF24L01_STATUS_FAILED,
+	NRF24L01_STATUS_INVALID_ARG
+} nrf24l01_status_t;
+
+typedef nrf24l01_status_t (*nrf24l01_func_spi_send)(uint8_t *buf_send, uint16_t len);
+typedef nrf24l01_status_t (*nrf24l01_func_spi_recv)(uint8_t *buf_recv, uint16_t len);
+typedef nrf24l01_status_t (*nrf24l01_func_set_gpio)(uint8_t level);
+typedef nrf24l01_status_t (*nrf24l01_func_get_gpio)(uint8_t *level);
 typedef void (*nrf24l01_func_delay)(uint32_t time_ms);
 
 /**
@@ -100,7 +107,7 @@ typedef struct {
  *
  * @return
  *      - Handle structure: Success.
- *      - Others:           Fail.
+ *      - Others: Failed.
  */
 nrf24l01_handle_t nrf24l01_init(void);
 
@@ -111,10 +118,10 @@ nrf24l01_handle_t nrf24l01_init(void);
  * @param   config Configuration structure.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_set_config(nrf24l01_handle_t handle, nrf24l01_cfg_t config);
+nrf24l01_status_t nrf24l01_set_config(nrf24l01_handle_t handle, nrf24l01_cfg_t config);
 
 /*
  * @brief   Configure nRF24L01 to run.
@@ -122,10 +129,10 @@ err_code_t nrf24l01_set_config(nrf24l01_handle_t handle, nrf24l01_cfg_t config);
  * @param 	handle Handle structure.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_config(nrf24l01_handle_t handle);
+nrf24l01_status_t nrf24l01_config(nrf24l01_handle_t handle);
 
 /*
  * @brief   Transmit data. After that, monitor IRQ pin is necessary to call
@@ -135,10 +142,10 @@ err_code_t nrf24l01_config(nrf24l01_handle_t handle);
  * @param 	tx_payload Transmit buffer.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_transmit(nrf24l01_handle_t handle, uint8_t* tx_payload);
+nrf24l01_status_t nrf24l01_transmit(nrf24l01_handle_t handle, uint8_t* tx_payload);
 
 /*
  * @brief   Transmit data and polling until IRQ is triggered or timeout. Function
@@ -152,10 +159,10 @@ err_code_t nrf24l01_transmit(nrf24l01_handle_t handle, uint8_t* tx_payload);
  * @param 	timeout_ms Timeout in ms.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_transmit_polling(nrf24l01_handle_t handle, uint8_t* tx_payload, uint32_t timeout_ms);
+nrf24l01_status_t nrf24l01_transmit_polling(nrf24l01_handle_t handle, uint8_t* tx_payload, uint32_t timeout_ms);
 
 /*
  * @brief   Read data on RX FIFO. If no data is received, all are 0x00.
@@ -166,10 +173,10 @@ err_code_t nrf24l01_transmit_polling(nrf24l01_handle_t handle, uint8_t* tx_paylo
  * @param 	rx_payload Received buffer.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_receive(nrf24l01_handle_t handle, uint8_t* rx_payload);
+nrf24l01_status_t nrf24l01_receive(nrf24l01_handle_t handle, uint8_t* rx_payload);
 
 /*
  * @brief   Polling until IRQ pin is triggered or timeout. When data is received,
@@ -183,10 +190,10 @@ err_code_t nrf24l01_receive(nrf24l01_handle_t handle, uint8_t* rx_payload);
  * @param 	timeout_ms Timeout in ms.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_receive_polling(nrf24l01_handle_t handle, uint8_t* rx_payload, uint32_t timeout_ms);
+nrf24l01_status_t nrf24l01_receive_polling(nrf24l01_handle_t handle, uint8_t* rx_payload, uint32_t timeout_ms);
 
 /*
  * @brief   Clear transmitted interrupt flags.
@@ -197,10 +204,10 @@ err_code_t nrf24l01_receive_polling(nrf24l01_handle_t handle, uint8_t* rx_payloa
  * @param 	handle Handle structure.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_clear_transmit_irq_flags(nrf24l01_handle_t handle);
+nrf24l01_status_t nrf24l01_clear_transmit_irq_flags(nrf24l01_handle_t handle);
 
 /*
  * @brief   Clear received interrupt flags.
@@ -211,10 +218,10 @@ err_code_t nrf24l01_clear_transmit_irq_flags(nrf24l01_handle_t handle);
  * @param 	handle Handle structure.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_clear_receive_irq_flags(nrf24l01_handle_t handle);
+nrf24l01_status_t nrf24l01_clear_receive_irq_flags(nrf24l01_handle_t handle);
 
 /*
  * @brief   Flush receive buffer.
@@ -222,10 +229,10 @@ err_code_t nrf24l01_clear_receive_irq_flags(nrf24l01_handle_t handle);
  * @param 	handle Handle structure.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_flush_rx_fifo(nrf24l01_handle_t handle);
+nrf24l01_status_t nrf24l01_flush_rx_fifo(nrf24l01_handle_t handle);
 
 /*
  * @brief   Flush transmit buffer.
@@ -233,10 +240,10 @@ err_code_t nrf24l01_flush_rx_fifo(nrf24l01_handle_t handle);
  * @param 	handle Handle structure.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_flush_tx_fifo(nrf24l01_handle_t handle);
+nrf24l01_status_t nrf24l01_flush_tx_fifo(nrf24l01_handle_t handle);
 
 /*
  * @brief   Set nRF24L01 in power up mode.
@@ -246,10 +253,10 @@ err_code_t nrf24l01_flush_tx_fifo(nrf24l01_handle_t handle);
  * @param 	handle Handle structure.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_power_up(nrf24l01_handle_t handle);
+nrf24l01_status_t nrf24l01_power_up(nrf24l01_handle_t handle);
 
 /*
  * @brief   Set nRF24L01 in power up down.
@@ -263,10 +270,10 @@ err_code_t nrf24l01_power_up(nrf24l01_handle_t handle);
  * @param 	handle Handle structure.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_power_down(nrf24l01_handle_t handle);
+nrf24l01_status_t nrf24l01_power_down(nrf24l01_handle_t handle);
 
 /*
  * @brief   Get data on STATUS register.
@@ -278,10 +285,10 @@ err_code_t nrf24l01_power_down(nrf24l01_handle_t handle);
  * @param 	status Status.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_get_status(nrf24l01_handle_t handle, uint8_t *status);
+nrf24l01_status_t nrf24l01_get_status(nrf24l01_handle_t handle, uint8_t *status);
 
 /*
  * @brief   Get data on FIFO_STATUS register.
@@ -304,10 +311,10 @@ err_code_t nrf24l01_get_status(nrf24l01_handle_t handle, uint8_t *status);
  * @param 	status Status.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_get_fifo_status(nrf24l01_handle_t handle, uint8_t *status);
+nrf24l01_status_t nrf24l01_get_fifo_status(nrf24l01_handle_t handle, uint8_t *status);
 
 /*
  * @brief   Clear interrupt triggered by data sent completely on TX FIFO.
@@ -319,10 +326,10 @@ err_code_t nrf24l01_get_fifo_status(nrf24l01_handle_t handle, uint8_t *status);
  * @param 	handle Handle structure.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_clear_tx_ds(nrf24l01_handle_t handle);
+nrf24l01_status_t nrf24l01_clear_tx_ds(nrf24l01_handle_t handle);
 
 /*
  * @brief   Clear interrupt triggered when maximum number of TX retransmits is reached.
@@ -333,10 +340,10 @@ err_code_t nrf24l01_clear_tx_ds(nrf24l01_handle_t handle);
  * @param 	handle Handle structure.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_clear_max_rt(nrf24l01_handle_t handle);
+nrf24l01_status_t nrf24l01_clear_max_rt(nrf24l01_handle_t handle);
 
 /*
  * @brief   Clear interrupt triggered when data ready on RX FIFO.
@@ -347,10 +354,10 @@ err_code_t nrf24l01_clear_max_rt(nrf24l01_handle_t handle);
  * @param 	handle Handle structure.
  *
  * @return
- *      - ERR_CODE_SUCCESS: Success.
- *      - Others:           Fail.
+ *      - NRF24L01_STATUS_SUCCESS: Success.
+ *      - Others: Failed.
  */
-err_code_t nrf24l01_clear_rx_dr(nrf24l01_handle_t handle);
+nrf24l01_status_t nrf24l01_clear_rx_dr(nrf24l01_handle_t handle);
 
 #ifdef __cplusplus
 }
